@@ -25,7 +25,7 @@ router.post('/transfer', authMiddleware, async (req, res) => {
   const senderDetails = await Account.findOne({ userId: req.userId }).session(session);
 
   // Insufficient balance handling
-  if (!senderDetails || senderDetails.balance < amount) {
+  if (!senderDetails || senderDetails.balance < parseInt(amount)) {
     await session.abortTransaction();
     return res.status(400).json({ message: "Insufficient balance" });
   }

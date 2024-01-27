@@ -117,8 +117,10 @@ router.put("/", authMiddleware, async (req, res) => {
   });
 })
 
-router.get("/bulk", async (req, res) => {
+router.get("/bulk", authMiddleware, async (req, res) => {
   const filter = req.query.filter || "";
+
+  const loggedInUserId = req.userId;
 
   const users = await User.find({
     $or: [{
@@ -131,10 +133,12 @@ router.get("/bulk", async (req, res) => {
         "$regex": filter
       }
     }]
-  })
+  });
+
+  const finalUsersList = users.filter(x => x._id != loggedInUserId);
 
   res.json({
-    user: users.map(user => ({
+    user: finalUsersList.map(user => ({
       username: user.username,
       firstName: user.firstName,
       lastName: user.lastName,
